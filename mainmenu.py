@@ -7,23 +7,25 @@ WIDTH = 800
 HEIGHT = 600
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Сапёр")
+pygame.display.set_caption("Minesweeper")
 
-font = pygame.font.Font(None, 50)
-title_font = pygame.font.Font(None, 90)
+font = pygame.font.Font(None, 42)
+title_font = pygame.font.Font(None, 85)
+small_font = pygame.font.Font(None, 25)
 
+BACKGROUND = (76, 88, 68)
 WHITE = (255, 255, 255)
-DARK = (30, 35, 45)
-BUTTON = (55, 65, 80)
-BUTTON_HOVER = (75, 90, 110)
+YELLOW = (196, 181, 80)
+BUTTON = (61, 72, 55)
+BORDER = (130, 139, 112)
 
 buttons = [
-    pygame.Rect(250, 250, 300, 65),
-    pygame.Rect(250, 340, 300, 65),
+    pygame.Rect(250, 260, 300, 65),
+    pygame.Rect(250, 345, 300, 65),
     pygame.Rect(250, 430, 300, 65)
 ]
 
-names = ["Начать игру", "Настройки", "Выход"]
+names = ["НАЧАТЬ ИГРУ", "НАСТРОЙКИ", "ВЫХОД"]
 
 running = True
 
@@ -36,8 +38,10 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+
                 if buttons[0].collidepoint(mouse):
-                    print("Начать игру")
+                    import minesweeper
+                    minesweeper.start_game()
 
                 elif buttons[1].collidepoint(mouse):
                     print("Настройки")
@@ -45,23 +49,37 @@ while running:
                 elif buttons[2].collidepoint(mouse):
                     running = False
 
-    screen.fill(DARK)
+    screen.fill(BACKGROUND)
 
-    title = title_font.render("САПЁР", True, WHITE)
-    screen.blit(title, (300, 120))
+    title = title_font.render("MINESWEEPER", True, WHITE)
+    title_rect = title.get_rect(center=(WIDTH // 2, 145))
+    screen.blit(title, title_rect)
+
+    subtitle = small_font.render("CLASSIC GAME", True, YELLOW)
+    subtitle_rect = subtitle.get_rect(center=(WIDTH // 2, 200))
+    screen.blit(subtitle, subtitle_rect)
+
+    pygame.draw.line(screen, YELLOW, (250, 225), (550, 225), 2)
 
     for i in range(3):
         if buttons[i].collidepoint(mouse):
-            color = BUTTON_HOVER
+            text_color = YELLOW
+            border_color = YELLOW
         else:
-            color = BUTTON
+            text_color = WHITE
+            border_color = BORDER
 
-        pygame.draw.rect(screen, color, buttons[i], border_radius=10)
+        pygame.draw.rect(screen, BUTTON, buttons[i])
+        pygame.draw.rect(screen, border_color, buttons[i], 2)
 
-        text = font.render(names[i], True, WHITE)
+        text = font.render(names[i], True, text_color)
         text_rect = text.get_rect(center=buttons[i].center)
 
         screen.blit(text, text_rect)
+
+    footer = small_font.render("POWERED BY PYTHON & PYGAME", True, WHITE)
+    footer_rect = footer.get_rect(center=(WIDTH // 2, 550))
+    screen.blit(footer, footer_rect)
 
     pygame.display.update()
 
