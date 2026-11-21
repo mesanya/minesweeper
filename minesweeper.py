@@ -1,55 +1,96 @@
 
 import pygame
-import sys
+import random
 
-def start_game():
-    WIDTH = 800
-    HEIGHT = 600
 
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Сапёр")
+ROWS = 10
+COLS = 10
+MINES = 15
 
-    font = pygame.font.Font(None, 40)
+CELL_SIZE = 45
 
-    WHITE = (255, 255, 255)
-    DARK = (30, 35, 45)
-    CELL = (65, 80, 100)
+WIDTH = COLS * CELL_SIZE
+HEIGHT = ROWS * CELL_SIZE + 80
 
-    rows = 10
-    cols = 10
-    cell_size = 45
+BACKGROUND = (76, 88, 68)
+WHITE = (255, 255, 255)
+YELLOW = (196, 181, 80)
+CELL_COLOR = (61, 72, 55)
 
+
+def create_board():
     board = []
 
-    for row in range(rows):
+    for row in range(ROWS):
         line = []
 
-        for col in range(cols):
+        for col in range(COLS):
             line.append(0)
 
         board.append(line)
 
+    mines = 0
+
+    while mines < MINES:
+        row = random.randint(0, ROWS - 1)
+        col = random.randint(0, COLS - 1)
+
+        if board[row][col] != -1:
+            board[row][col] = -1
+            mines += 1
+
+    return board
+
+
+def calculate_numbers(board):
+    for row in range(ROWS):
+        for col in range(COLS):
+
+            if board[row][col] == -1:
+                continue
+
+            count = 0
+
+            for r in range(row - 1, row + 2):
+                for c in range(col - 1, col + 2):
+
+                    if r >= 0 and r < ROWS and c >= 0 and c < COLS:
+                        if board[r][c] == -1:
+                            count += 1
+
+            board[row][col] = count
+
+    return board
+
+
+def start_game():
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Сапёр")
+
+    board = create_board()
+    board = calculate_numbers(board)
+
     running = True
 
     while running:
-        screen.fill(DARK)
+        screen.fill(BACKGROUND)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                running = False
 
-        for row in range(rows):
-            for col in range(cols):
-                x = 175 + col * cell_size
-                y = 70 + row * cell_size
+        for row in range(ROWS):
+            for col in range(COLS):
+
+                x = col * CELL_SIZE
+                y = row * CELL_SIZE + 80
 
                 pygame.draw.rect(
-                    screen, CELL,
-                    (x, y, cell_size - 2, cell_size - 2)
+                    screen,
+                    CELL_COLOR,
+                    (x, y, CELL_SIZE - 2, CELL_SIZE - 2)
                 )
 
-        title = font.render("ИГРА", True, WHITE)
-        screen.blit(title, (365, 20))
-
         pygame.display.update()
+
+    return
