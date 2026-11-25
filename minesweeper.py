@@ -2,6 +2,7 @@
 import pygame
 import random
 import sys
+import os
 
 CELL_SIZE = 40
 TOP_HEIGHT = 42
@@ -33,8 +34,13 @@ info_font = pygame.font.Font(None, 25)
 small_font = pygame.font.Font(None, 21)
 
 # Иконки для бомбы и флажка
-bomb_image = pygame.image.load("icons/bomb.png")
-defuser_image = pygame.image.load("icons/defuser.png")
+if getattr(sys, "frozen", False):
+    base_path = sys._MEIPASS
+else:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+bomb_image = pygame.image.load(os.path.join(base_path, "icons", "bomb.png"))
+defuser_image = pygame.image.load(os.path.join(base_path, "icons", "defuser.png"))
 
 bomb_image = pygame.transform.scale(bomb_image, (28, 28))
 defuser_image = pygame.transform.scale(defuser_image, (28, 28))
