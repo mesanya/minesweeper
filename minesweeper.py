@@ -6,6 +6,7 @@ import sys
 CELL_SIZE = 40
 TOP_HEIGHT = 42
 BOTTOM_HEIGHT = 28
+SIDE_PADDING = 16
 
 BACKGROUND = (76, 88, 68)
 WHITE = (255, 255, 255)
@@ -14,11 +15,29 @@ CELL_COLOR = (61, 72, 55)
 OPEN_COLOR = (105, 112, 88)
 BORDER = (130, 139, 112)
 
+NUMBER_COLORS = {
+    1: (90, 170, 255),
+    2: (110, 210, 120),
+    3: (255, 105, 105),
+    4: (175, 145, 255),
+    5: (255, 175, 90),
+    6: (80, 210, 210),
+    7: (245, 245, 245),
+    8: (180, 180, 180)
+}
+
 pygame.init()
 
 cell_font = pygame.font.Font(None, 30)
 info_font = pygame.font.Font(None, 25)
 small_font = pygame.font.Font(None, 21)
+
+# Иконки для бомбы и флажка
+bomb_image = pygame.image.load("icons/bomb.png")
+defuser_image = pygame.image.load("icons/defuser.png")
+
+bomb_image = pygame.transform.scale(bomb_image, (28, 28))
+defuser_image = pygame.transform.scale(defuser_image, (28, 28))
 
 
 # Создание игрового поля и размещение мин
@@ -108,7 +127,7 @@ def open_cell(board, opened, flags, row, col, rows, cols):
 def start_game(rows=10, cols=10, mines=15,
                show_timer=True, show_counter=True):
 
-    width = cols * CELL_SIZE
+    width = cols * CELL_SIZE + SIDE_PADDING * 2
     height = TOP_HEIGHT + rows * CELL_SIZE + BOTTOM_HEIGHT
 
     screen = pygame.display.set_mode((width, height))
@@ -162,7 +181,7 @@ def start_game(rows=10, cols=10, mines=15,
 
                 mouse_x, mouse_y = event.pos
 
-                col = mouse_x // CELL_SIZE
+                col = (mouse_x - SIDE_PADDING) // CELL_SIZE
                 row = (mouse_y - TOP_HEIGHT) // CELL_SIZE
 
                 if 0 <= row < rows and 0 <= col < cols:
@@ -253,7 +272,7 @@ def start_game(rows=10, cols=10, mines=15,
                 WHITE
             )
 
-            screen.blit(counter, (8, 11))
+            screen.blit(counter, (SIDE_PADDING, 11))
 
         if show_timer:
             timer = info_font.render(
@@ -263,7 +282,7 @@ def start_game(rows=10, cols=10, mines=15,
             )
 
             timer_rect = timer.get_rect(
-                right=width - 8,
+                right=width - SIDE_PADDING,
                 centery=TOP_HEIGHT // 2
             )
 
@@ -273,7 +292,7 @@ def start_game(rows=10, cols=10, mines=15,
         for row in range(rows):
             for col in range(cols):
 
-                x = col * CELL_SIZE
+                x = SIDE_PADDING + col * CELL_SIZE
                 y = TOP_HEIGHT + row * CELL_SIZE
 
                 if opened[row][col]:
@@ -297,18 +316,13 @@ def start_game(rows=10, cols=10, mines=15,
                 if opened[row][col]:
 
                     if board[row][col] == -1:
-                        pygame.draw.circle(
-                            screen,
-                            YELLOW,
-                            (x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                            9
-                        )
+                        screen.blit(bomb_image, (x + 6, y + 6))
 
                     elif board[row][col] > 0:
                         number = cell_font.render(
                             str(board[row][col]),
                             True,
-                            WHITE
+                            NUMBER_COLORS[board[row][col]]
                         )
 
                         number_rect = number.get_rect(
@@ -318,22 +332,11 @@ def start_game(rows=10, cols=10, mines=15,
                         screen.blit(number, number_rect)
 
                 elif flags[row][col]:
-                    flag = cell_font.render("F", True, YELLOW)
-
-                    flag_rect = flag.get_rect(
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2)
-                    )
-
-                    screen.blit(flag, flag_rect)
+                    screen.blit(defuser_image, (x + 6, y + 6))
 
                 # Показ всех мин после окончания игры
                 if game_over and board[row][col] == -1:
-                    pygame.draw.circle(
-                        screen,
-                        YELLOW,
-                        (x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        9
-                    )
+                    screen.blit(bomb_image, (x + 6, y + 6))
 
         # Подсказка управления
         if game_over:
