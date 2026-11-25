@@ -21,6 +21,7 @@ info_font = pygame.font.Font(None, 25)
 small_font = pygame.font.Font(None, 21)
 
 
+# Создание игрового поля и размещение мин
 def create_board(rows, cols, mines):
     board = []
 
@@ -45,6 +46,7 @@ def create_board(rows, cols, mines):
     return board
 
 
+# Подсчёт мин вокруг каждой клетки
 def calculate_numbers(board, rows, cols):
     for row in range(rows):
         for col in range(cols):
@@ -66,6 +68,7 @@ def calculate_numbers(board, rows, cols):
     return board
 
 
+# Создание таблицы открытых клеток и флажков
 def create_marks(rows, cols):
     marks = []
 
@@ -80,6 +83,7 @@ def create_marks(rows, cols):
     return marks
 
 
+# Открытие клетки и соседних пустых клеток
 def open_cell(board, opened, flags, row, col, rows, cols):
     if row < 0 or row >= rows or col < 0 or col >= cols:
         return
@@ -100,6 +104,7 @@ def open_cell(board, opened, flags, row, col, rows, cols):
                     )
 
 
+# Основная функция запуска игры
 def start_game(rows=10, cols=10, mines=15,
                show_timer=True, show_counter=True):
 
@@ -125,6 +130,7 @@ def start_game(rows=10, cols=10, mines=15,
     running = True
 
     while running:
+        # Обработка нажатий клавиш и мыши
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -136,6 +142,7 @@ def start_game(rows=10, cols=10, mines=15,
                 if event.key == pygame.K_ESCAPE:
                     running = False
 
+                # Перезапуск игры
                 if event.key == pygame.K_r and game_over:
                     board = create_board(rows, cols, mines)
                     board = calculate_numbers(board, rows, cols)
@@ -150,6 +157,7 @@ def start_game(rows=10, cols=10, mines=15,
                     start_ticks = None
                     end_ticks = None
 
+            # Открытие клеток и установка флажков
             if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
 
                 mouse_x, mouse_y = event.pos
@@ -163,6 +171,7 @@ def start_game(rows=10, cols=10, mines=15,
 
                         if not flags[row][col] and not opened[row][col]:
 
+                            # При первом нажатии мины не будет
                             if first_click:
                                 while board[row][col] == -1:
                                     board = create_board(rows, cols, mines)
@@ -187,6 +196,7 @@ def start_game(rows=10, cols=10, mines=15,
                         if not opened[row][col]:
                             flags[row][col] = not flags[row][col]
 
+        # Подсчёт открытых клеток и установленных флажков
         opened_count = 0
         flag_count = 0
 
@@ -199,11 +209,13 @@ def start_game(rows=10, cols=10, mines=15,
                 if flags[row][col]:
                     flag_count += 1
 
+        # Проверка победы
         if opened_count == rows * cols - mines and not game_over:
             game_over = True
             win = True
             end_ticks = pygame.time.get_ticks()
 
+        # Расчёт времени игры
         if start_ticks is None:
             elapsed = 0
 
@@ -218,6 +230,7 @@ def start_game(rows=10, cols=10, mines=15,
 
         screen.fill(BACKGROUND)
 
+        # Отображение счётчика мин и таймера
         if game_over:
             if win:
                 message = "ПОБЕДА!"
@@ -256,6 +269,7 @@ def start_game(rows=10, cols=10, mines=15,
 
             screen.blit(timer, timer_rect)
 
+        # Отрисовка игрового поля
         for row in range(rows):
             for col in range(cols):
 
@@ -312,6 +326,7 @@ def start_game(rows=10, cols=10, mines=15,
 
                     screen.blit(flag, flag_rect)
 
+                # Показ всех мин после окончания игры
                 if game_over and board[row][col] == -1:
                     pygame.draw.circle(
                         screen,
@@ -320,6 +335,7 @@ def start_game(rows=10, cols=10, mines=15,
                         9
                     )
 
+        # Подсказка управления
         if game_over:
             hint_text = "R - заново    ESC - меню"
         else:
