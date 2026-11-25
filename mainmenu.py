@@ -34,20 +34,25 @@ while running:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            sys.exit()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
 
-                if buttons[0].collidepoint(mouse):
+                if buttons[0].collidepoint(event.pos):
                     import minesweeper
                     minesweeper.start_game()
 
-                elif buttons[1].collidepoint(mouse):
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                    pygame.display.set_caption("Minesweeper")
+
+                elif buttons[1].collidepoint(event.pos):
                     print("Настройки")
 
-                elif buttons[2].collidepoint(mouse):
-                    running = False
+                elif buttons[2].collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
 
     screen.fill(BACKGROUND)
 
