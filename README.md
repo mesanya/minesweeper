@@ -49,6 +49,7 @@ Minesweeper — это компьютерная версия классичес�
 
 - Python
 - Pygame
+- PyInstaller
 
 ---
 
